@@ -11,5 +11,6 @@ Welcome to huago-sdk-doc's documentation!
    :caption: Contents:
 
    sdk
+   hello
 
 
