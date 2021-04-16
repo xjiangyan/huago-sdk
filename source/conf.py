@@ -69,3 +69,10 @@ source_suffix = {
     '.txt': 'markdown',
     '.md': 'markdown',
 }
+
+    #编辑配置文件source/conf.py在最后一行复制下方配置
+from recommonmark.parser import CommonMarkParser
+
+source_parsers = {
+  '.md': CommonMarkParser,
+}
