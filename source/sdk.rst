@@ -401,6 +401,105 @@ void flipPage(boolean flip)	 											AB面翻转
 		int doubleNum; //双张次数
 		int errorNum;  //其他异常次数
 
+==========
+版本变动
+==========
+---------------
+- **2.5.6版本**
+---------------
+
+-------------------------
+1.添加日志上报功能 
+-------------------------
+
+::
+
+	//当设备出现故障，用户可上传本机信息进行后台分析
+	//@param description 描述信息（可选）  填入 “问题产生的经过”，方便后续问题排查
+	//@param callBack  日志上传回调
+	reportInfo(String description, LogcatManager.ReportCallBack callBack)
+
+-----------------------------
+2. 设置自动待纸扫描的等待时间
+-----------------------------
+
+::
+
+	//@param time 单位：毫秒
+	setWaitPaperTime(int time)
+
+-------------------------
+3.设置裁切时明暗场阈值
+-------------------------
+
+::
+
+	//@param threshold 默认值为40
+	setCropThreshold(int threshold)
+
+---------------
+- **2.6.0版本**
+---------------
+
+
+-------------------------
+1.添加折角检测功能
+-------------------------
+
+::
+
+	//@since SDK 2.6.0   @param b 是否检测折角
+	setDetectDogEar(boolean b);
+
+-------------------------
+2.添加新的图片回调方式
+-------------------------
+
+::
+
+    HGScanManager.getInstance().setPreviewCallback(new PreviewWithRecCallback() {
+            //开启了‘折角检测’ 等功能时回调,多一个检测结果
+            //RecResult::hasDogEar 是否有折角
+            @Override
+            public void onPreview(int index, Object image, RecResult recResult) {
+           
+            }
+            //普通回调，与2.6.0之前版本逻辑一致
+            @Override
+            public void onPreview(int index, Object image) {
+           
+            }
+        }, PreviewCallback.FORMAT_JPEG_FILE);
+
+	//对比sdk2.6.0之前的图片回调
+	//HGScanManager.getInstance().setPreviewCallback(new PreviewCallback() {
+	//    @Override
+	//    public void onPreview(int index, Object image) {
+	//        
+	//    }
+	//}, PreviewCallback.FORMAT_JPEG_FILE);
+
+
+-------------------------
+3.添加二维码识别功能
+-------------------------
+
+::
+
+		  QrCodeDec qrCodeDec = new QrCodeDec();
+		  
+		  //传入bitmap进行检测  返回值：可能是多个二维码信息
+		  List<String> decode = qrCodeDec.decode(bitmap);
+		  //传入图片路径进行全图检测
+		  List<String> decode = qrCodeDec.decode(path);
+		  //传入图片路径，并传入要检测的矩形区域   
+		  //org.opencv.core.Rect(0,0,60,60)：左上角坐标为0,0  并且宽高都为60的矩形
+		  List<String> decode = qrCodeDec.decode(path, new org.opencv.core.Rect(0,0,60,60));
+
+
+
+
+
 =============
 常见问题
 =============
