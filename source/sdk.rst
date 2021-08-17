@@ -218,6 +218,10 @@ void setAdjustOrientation(boolean b)  									设置mark点文本校正方向 �
 void setAutoScanDelayTime(int millisecond) 								设置多少毫秒内待纸自动扫描
 Statistics getStatistics()  											获取设备扫描数据统计
 void flipPage(boolean flip)	 											AB面翻转
+void reportInfo															设备日志上传
+void getSN																设备唯一编号
+void setCropThreshold													设置裁切时明暗场阈值
+void setDetectDogEar													折角检测
 =============================================================			==============================================================================================================================================================
 
 
@@ -226,6 +230,17 @@ void flipPage(boolean flip)	 											AB面翻转
 快速开始
 =========
 
+----------------------------
+- **在build.gradle中配置**
+----------------------------
+
+::
+	
+	//统一使用'armeabi-v7a'
+    ndk {
+            abiFilters 'armeabi-v7a'
+        }
+	
 ----------------------------
 - **在application中初始化**
 ----------------------------
@@ -286,9 +301,6 @@ void flipPage(boolean flip)	 											AB面翻转
 	HGScanManager.getInstance().setDoubleChecked(true);//开启双张检测
 	HGScanManager.getInstance().setAutoCut(true);//开启图像裁切
 	HGScanManager.getInstance().setAdjust(true);//开启图像纠偏
-	//开启mark点方向矫正,多边定位，不丢弃图
-	HGScanManager.getInstance().setAdjustOrientation( ScanDef.MarkType.Muti, false)
-	//HGScanManager.getInstance().setAdjustOrientation(true);//开启mark点方向矫正（默认多边定位，不丢弃图）
 
 	//AB面翻转 @default false：面向用户页后出图   true:面向用户页先出图
 	HGScanManager.getInstance().flipPage(false);
