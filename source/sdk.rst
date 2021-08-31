@@ -313,14 +313,20 @@ void setDpi																自定义dpi
 
 ::
 
+	// @params index:纸张出图顺序index，绝对值相同的为一张纸的正反面
+	// @params image:在本地的图片地址 例如：/sdcard/picture/Doc1630391378_5.jpg
+	// 若文件名末尾数字的绝对值相同，属于一张纸的正反面。
+	// 例如：Doc1630391378_5.jpg 与 Doc1630391390_-5.jpg。
 	HGScanManager.getInstance().setPreviewCallback(new PreviewCallback() {
-            @Override
-            public void onPreview(int index, Object image) {
-                BitmapInfo bitmapInfo = new BitmapInfo();
-                bitmapInfo.index = index;//index
-                bitmapInfo.path = (String) image;//在本地的图片地址
-            }
-        }, PreviewCallback.FORMAT_JPEG_FILE);//设置保存格式为jpeg
+		@Override
+		public void onPreview(int index, Object image) {
+		
+			BitmapInfo bitmapInfo = new BitmapInfo();
+			bitmapInfo.index = index;//index
+			bitmapInfo.path = (String) image;//在本地的图片地址
+			
+	}}, PreviewCallback.FORMAT_JPEG_FILE);//设置保存格式为jpeg
+
 
 --------------------
 - **释放预览接口**
