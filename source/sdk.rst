@@ -222,6 +222,7 @@ void reportInfo															设备日志上传
 void getSN																设备唯一编号
 void setCropThreshold													设置裁切时明暗场阈值
 void setDetectDogEar													折角检测
+void setDpi																自定义dpi
 =============================================================			==============================================================================================================================================================
 
 
@@ -412,6 +413,20 @@ void setDetectDogEar													折角检测
 		int jamOutNum; //卡纸次数
 		int doubleNum; //双张次数
 		int errorNum;  //其他异常次数
+		
+---------------
+- **混淆规则**
+---------------
+
+::
+
+	-keep class xcrash.** { *; }
+	-keep class org.xutils.** { *; }
+	-keep class org.opencv.** { *; }
+	-keepattributes Signature
+	-dontwarn com.alibaba.fastjson.**
+	-keep class com.alibaba.fastjson.**{*; }
+	-keep class com.huagaoscan.sdk.** { *; }
 
 ==========
 版本变动
@@ -511,6 +526,26 @@ void setDetectDogEar													折角检测
 
 
 
+---------------
+- **2.6.0版本**
+---------------
+
+-------------------------
+1.新增自定义dpi功能
+-------------------------
+
+::
+
+	//建议取值范围在150-600之间，取值过低图像质量低；取值过高，图像处理时间
+	增长，甚至可能会出现内存溢出的情况。
+	HGScanManager.getInstance().setDpi(200);
+	//对比2.6.1之前的dpi设置：
+	// ScanDef.Qulality.Low（150dpi）
+	// ScanDef.Qulality.Standard(200dpi)
+	// ScanDef.Qulality.High(300dpi)
+	HGScanManager.getInstance().setQuality(ScanDef.Qulality.Stand
+	ard)
+
 
 =============
 常见问题
@@ -568,6 +603,21 @@ void setDetectDogEar													折角检测
 ..
 
 	进入adb shell之后，setprop persist.sys.hidenav 1,可以隐藏虚拟按键，全屏显示
+	
+-----------------------------
+7、如何开机自动拉起一个应用？
+-----------------------------
+..
+
+	进入adb shell之后，setprop persist.sys.package.autorun “应用包名”。
+	
+---------------------------------------------------------------
+8、在设置了扫描回调之后，扫描仪扫描结束为什么不会返回图片信息？
+---------------------------------------------------------------
+..
+
+	请确保只开启了一个扫描程序，后开启监听的扫描程序会优先接收到扫描信息，而之前的不会接收消息。
+
 
 
 
