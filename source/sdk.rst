@@ -11,7 +11,7 @@
 
 ..
 
-	华高A4高速扫描仪SDK为基于设备Android系统开发相关应用提供封装的API，同时sdk内部也内置了opencv的java库以方便对扫描后的图像进行二次开发。将HGSDK_x.x.x.aar添加至Android项目中并依赖，就可以使用SDK中的功能。同时我们也提供了SDK使用的demo，以及生产的apk文件，以便体验和开发。
+	华高A4/A3高速扫描仪SDK为基于设备Android系统开发相关应用提供封装的API，同时sdk内部也内置了opencv的java库以方便对扫描后的图像进行二次开发。将相应.aar添加至Android项目中并依赖，就可以使用SDK中的功能。同时我们也提供了SDK使用的demo，以及生产的apk文件，以便体验和开发。
 
 ==============
 常见扫描仪状态
@@ -47,36 +47,27 @@ STATE_DEVICE_REPARING    RepairingState    设备恢复中
 ==========================	================		========================
   EventDef.S_EVT			 code		    				含义
 ==========================	================		========================
-S_EVT_SCAN_FINISHED   		0							扫描初始化状态正常
-S_EVT_SCAN_FINISHED    		2							扫描结束
+S_EVT_COVER_OPENED      	1							扫描仪盖子打开
 S_EVT_CLEAR_ERR				3							清除错误状态
 S_EVT_PAPER_PULLOUT  		5							退出纸张
-S_EVT_COVER_OPENED      	1							扫描仪盖子打开
-S_EVT_COVER_CLOSED    		258							扫描仪盖子合起
-S_EVT_PAPER_AT_SCAN     	8							正在扫描
-S_EVT_PAPER_NOT_AT_SCAN		262							没有在扫描
-S_EVT_DOUBLEPAPER      		272							检测到双张
-S_EVT_NOT_DOUBLEPAPER      	273							检测到不是双张
-S_EVT_START_SCAN      		69							开始扫描
-S_EVT_STOP_SCAN      		70							停止扫描
-S_EVT_SCAN_STARTED      	274							已经开始扫描
-S_EVT_SCAN_STOPPED      	275							已经停止扫描
-S_EVT_JAM_IN				276							搓纸失败/卡纸事件
-S_EVT_JAM_OUT				277							卡纸/卡纸取出
-S_EVT_SAMPLE_ERR      		278							图像采样错误
-S_EVT_ERROR_PICKING      	4							取纸错误
 S_EVT_ERROR_JAM      		8							卡纸错误
 S_EVT_ERROR_DOUBLEPAPER		16							双张错误
-S_EVT_ERROR_STAPLE      	32							unused
 S_EVT_ERROR_FPGA      		68							FPGA错误
-S_EVT_HAVING_IMAGE      	71							有图了
-S_EVT_PAPER_NOT_STANDBY		0							不在待扫描状态
-S_EVT_PAPER_STANDBY			0							处于待扫描状态
+S_EVT_START_SCAN      		69							开始扫描
+S_EVT_STOP_SCAN      		70							停止扫描
+S_EVT_PAPER_NOT_STANDBY		96							纸张未就绪
+S_EVT_PAPER_STANDBY			97							纸张就绪
+S_EVT_COVER_CLOSED    		258							扫描仪盖子合起
+S_EVT_DOUBLEPAPER      		272							检测到双张
+S_EVT_SCAN_STARTED      	274							已经开始扫描
+S_EVT_SCAN_STOPPED      	275							已经停止扫描
+S_EVT_JAM_IN				276							搓纸失败
+S_EVT_JAM_OUT				277							卡纸
+S_EVT_SAMPLE_ERR      		278							图像采样错误
 S_EVT_DEVICE_UNVAILABLE	 	520							设备不可用
 S_EVT_DEVICE_VAILABLE		521							设备可用
 S_EVT_WHEEL_NEED_REPLACED	528							滚轮需要替换
 ==========================	================		========================
-
 
 
 ===========
@@ -341,15 +332,6 @@ void setDpi																自定义dpi
         super.onDestroy();
     }
 
-------------------------
-- **获取缓存的缩略图**
-------------------------
-
-::
-
-	//index为previewCallback中返回的index 默认存储20张，可能为空
-	Bitmap bitmap = HGScanManager.getInstance().getCachedPrevImage(index);
-
 ----------------
 - **开始扫描**
 ----------------
@@ -364,8 +346,6 @@ void setDpi																自定义dpi
 
 ::
 
-	HGScanManager.getInstance().operate(ScanDef.CMD.PASUE);
-	//或
 	HGScanManager.getInstance().pauseScan();
 	
 ---------------
@@ -374,8 +354,6 @@ void setDpi																自定义dpi
 
 ::
 
-	HGScanManager.getInstance().operate(ScanDef.CMD.STOP);
-	//或
 	HGScanManager.getInstance().stopScan();
 
 ---------------
@@ -384,8 +362,6 @@ void setDpi																自定义dpi
 
 ::
 
-	HGScanManager.getInstance().operate(ScanDef.CMD.RESUME);
-	//或
 	HGScanManager.getInstance().resumeScan();
 
 -----------------
@@ -563,14 +539,14 @@ void setDpi																自定义dpi
 
 ..
 
-	设备连接局域网后，在命令行中输入adb connnect 设备ip:5555即可。
+	设备连接局域网后，在命令行中输入adb connnect 设备ip:5555即可。（不可使用usb调试）
 
 -----------------------------------------
 2、扫描纸张的时候越扫越慢，这是什么原因？
 -----------------------------------------
 ..
 
-	我们是扫描一体机，不同于传统机器图片处理放在PC端处理，所以在处理图片的时候会根据任务对速度有个调节，最终的速度会是稳定的。
+	我们是扫描一体机，不同于传统机器图片处理放在PC端处理，所以在处理图片的时候会根据任务对速度有个调节，最终的速度会是稳定的。如果在本机做过多图像处理等导致CPU使用率增加而降低了扫描速度的情况，建议将重量级任务放到云端处理，这样设备可以达到较快扫描速度。
 
 --------------------------------------	
 3、如何查看设备信息，如固件版本等？
