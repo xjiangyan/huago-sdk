@@ -11,5 +11,6 @@ Welcome to huago-sdk's documentation!
    :caption: Contents:
 
    sdk
+   smsdk
 
 
