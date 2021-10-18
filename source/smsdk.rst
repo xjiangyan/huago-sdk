@@ -46,7 +46,7 @@ boolean setDensityDpi(int density)										设置屏幕密度
 boolean resetDensityDpi()												重置屏幕密度
 boolean takeScreenshot(String path, String name)						屏幕截屏
 boolean setScreenOff(boolean off)										控制屏幕开关
-boolean clearAppCache(String pkg)											清除应用缓存
+boolean clearAppCache(String pkg)										清除应用缓存
 boolean forceStopApp(String pkg)										强制关闭某个应用
 boolean execSuCmd(String command)										以root权限执行shell命令
 =============================================================			==============================================================================================================================================================
