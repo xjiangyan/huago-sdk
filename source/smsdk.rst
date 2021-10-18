@@ -8,7 +8,7 @@
 
 ..
 
-	本SYS-SDK对基于rk3399版本的Android系统的华高扫描仪，提供一些常用功能以及系统性功能帮助Android开发。
+	本SYS-SDK(SystemSdk)对基于rk3399版本的Android系统的华高扫描仪，提供一些常用功能以及系统性功能帮助Android开发。
 
 ================
 sdk调用方式
@@ -140,8 +140,8 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 ::
 
 	//@return RemovableStorageInfo 包含有path（装载的路径）以及id（装载的id）
-	// path:外部存储设备在扫描仪上挂载的根路径，可以添加子路径来实现外部存储的写入\读取文件功能
-	// id: 在弹出外部存储设备时可用
+	// storageList.getPath():外部存储设备在扫描仪上挂载的根路径，可以添加子路径来实现外部存储的写入\读取文件功能
+	// storageList.getId(): 在弹出外部存储设备时可用
 	List<RemovableStorageInfo> storageList = HGSM.getInstance().getRemovableExternalStorageList();
 	
 -------------------------------------
@@ -289,7 +289,7 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 
 ::
 
-	//@param path 需要保存的目录
+	//@param path 需要保存的目录  需要保证路径存在
 	//@param name 保存文件名
 	HGSM.getInstance().takeScreenshot(String path, String name);
 
