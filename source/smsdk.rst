@@ -46,7 +46,7 @@ boolean setDensityDpi(int density)										设置屏幕密度
 boolean resetDensityDpi()												重置屏幕密度
 boolean takeScreenshot(String path, String name)						屏幕截屏
 boolean setScreenOff(boolean off)										控制屏幕开关
-boolean clearApp(String pkg)											清除应用缓存
+boolean clearAppCache(String pkg)											清除应用缓存
 boolean forceStopApp(String pkg)										强制关闭某个应用
 boolean execSuCmd(String command)										以root权限执行shell命令
 =============================================================			==============================================================================================================================================================
@@ -311,7 +311,7 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 	//效果相当于在设置里的应用信息界面点击了「清除缓存」和「清除数据」
 	//可用于恢复一些异常状态
 	//@param pkg 要清除应用缓存的APP包名
-	HGSM.getInstance().clearApp("com.huago.app");
+	HGSM.getInstance().clearAppCache("com.huago.app");
 
 -------------------------------------
 - **强制关闭某个应用**
