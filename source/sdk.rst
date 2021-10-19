@@ -575,10 +575,26 @@ void setDpi																自定义dpi
 ---------------------------------
 5、如何配置自己的launcher程序？
 ---------------------------------
+
 ..
 
-	进入adb shell之后，setprop persist.sys.default.home "定制launcher的包名"，可以将系统启动桌面设置为自己开发的launcher
+	1:首先在AndroidManifest.xml中，确保存在 category.DEFAULT 以及category.HOME
 
+::
+
+	<activity android:name=".MainActivity">
+		<intent-filter>
+			<action android:name="android.intent.action.MAIN"/>
+			<category android:name="android.intent.category.DEFAULT" /><!--必须-->
+			<category android:name="android.intent.category.HOME"></category><!--必须-->
+			<category android:name="android.intent.category.LAUNCHER" />
+		</intent-filter>
+	</activity>
+
+..
+
+	2:进入adb shell之后，setprop persist.sys.default.home "定制launcher的包名"，可以将系统启动桌面设置为自己开发的launcher
+	
 ----------------------
 6、如何隐藏虚拟按键？
 ----------------------
@@ -589,6 +605,20 @@ void setDpi																自定义dpi
 -----------------------------
 7、如何开机自动拉起一个应用？
 -----------------------------
+..
+
+	1 : 首先在AndroidManifest.xml中，确保存在category.DEFAULT
+
+::
+
+	<activity android:name=".MainActivity">
+		<intent-filter>
+			<action android:name="android.intent.action.MAIN"/>
+			<category android:name="android.intent.category.DEFAULT" /><!--必须-->
+			<category android:name="android.intent.category.LAUNCHER" />
+		</intent-filter>
+	</activity>
+	
 ..
 
 	进入adb shell之后，setprop persist.sys.package.autorun “应用包名”。
