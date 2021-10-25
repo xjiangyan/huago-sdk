@@ -27,40 +27,40 @@ sdk调用方式
 
 	**HGSM.getInstance().xxx();**
 
-=============================================================			==============================================================================================================================================================
- 方法名定义  															含义
-=============================================================  			==============================================================================================================================================================
-String getKernelVersion()												获取kernel版本信息
-String getAndroidVersion()												获取Android版本信息
-String getFirmwareVersion()   											获取固件版本信息
-String getAPIVersion()  												获取api版本信息
-String getAndroidDisplay() 												获取系统安装（升级）时间
-void hideNavBar(boolean hide) 											设置是否隐藏底部导航栏
-void setStatusBarDragable(boolean  drag)  								设置是否可以下拉出顶部状态栏
-void setAppAutoRun(String pkg) 											设置开机需要拉起的app
-void setDefaultLauncher(String pkg) 									设置默认的launcher
-List<RemovableStorageInfo> getRemovableExternalStorageList() 			获取外部可移动存储列表（U盘等）
-boolean unMountExternalStorage(String id)								根据提供的外部存储id来弹出设备
-void shutdown()															关机
-void reboot(boolean safeMode)											重启
-void togglePanel()														拉出\收起状态栏
-void collapsePanels()													收起状态栏
-void expandPanel()														展开状态栏
-void setSysSleepTime(int delayTime)										设置系统的休眠时间
-int getSleepTimeOut(Context context)									获取系统休眠时间
-int getScreenWidth(Context context)										获取屏幕可用宽度px
-int getScreenHeight(Context context)									获取屏幕可用高度px
-int getFullScreenWidth(Activity context)								获取全屏的宽度px
-int getFullScreenHeight(Activity context)								获取全屏的高度px
-int getDensityDpi(Context context)										获取屏幕密度值
-boolean setDensityDpi(int density)										设置屏幕密度
-boolean resetDensityDpi()												重置屏幕密度
-boolean takeScreenshot(String path, String name)						屏幕截屏
-boolean setScreenOff(boolean off)										控制屏幕开关
-boolean clearAppCache(String pkg)										清除应用缓存
-boolean forceStopApp(String pkg)										强制关闭某个应用
-boolean execSuCmd(String command)										以root权限执行shell命令
-=============================================================			==============================================================================================================================================================
+=============================================================================			==============================================================================================================================================================
+ 方法名定义  																			含义
+=============================================================================			==============================================================================================================================================================
+String getKernelVersion()																获取kernel版本信息
+String getAndroidVersion()																获取Android版本信息
+String getFirmwareVersion()   															获取固件版本信息
+String getAPIVersion()  																获取api版本信息
+String getAndroidDisplay() 																获取系统安装（升级）时间
+void hideNavBar(boolean hide) 															设置是否隐藏底部导航栏
+void setStatusBarDragable(boolean  drag)  												设置是否可以下拉出顶部状态栏
+void setAppAutoRun(String pkg) 															设置开机需要拉起的app
+void setDefaultLauncher(String pkg) 													设置默认的launcher
+List<RemovableStorageInfo> getRemovableExternalStorageList() 							获取外部可移动存储列表（U盘等）
+boolean unMountExternalStorage(String id)												根据提供的外部存储id来弹出设备
+boolean shutdown()																		关机
+boolean reboot(boolean safeMode)														重启
+boolean setSysSleepTime(int delayTime)													设置屏幕的休眠时间
+int getSleepTimeOut(Context context)													获取屏幕休眠时间
+int getScreenWidth(Context context)														获取屏幕可用宽度px
+int getScreenHeight(Context context)													获取屏幕可用高度px
+int getFullScreenWidth(Activity context)												获取全屏的宽度px
+int getFullScreenHeight(Activity context)												获取全屏的高度px
+int getDensityDpi(Context context)														获取屏幕密度值
+boolean setDensityDpi(int density)														设置屏幕密度
+boolean resetDensityDpi()																重置屏幕密度
+void takeScreenshot(String path, String name, ScreenShotCallback callback)				屏幕截屏
+boolean setScreenOff(boolean off)														控制屏幕开关
+boolean clearAppCache(String pkg)														清除应用缓存
+boolean forceStopApp(String pkg)														强制关闭某个应用
+boolean execSuCmd(String command)														以root权限执行shell命令
+void silentInstallApk(String apkPath, InstallCallback callback)							静默安装apk
+void silentUninstallApp(String pkg, UnInstallCallback callback)							静默卸载APP
+void otaUpdate(String otaFilePath)														ota系统升级
+=============================================================================			==============================================================================================================================================================
 
 
 
@@ -164,7 +164,12 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 	//@param id 由getRemovableExternalStorageList方法获取到的id
 	//@return result: true:弹出成功  false:弹出失败  弹出后即可拔出外部存储（直接拔出可能导致损坏）
 	//弹出所需时间与存储设备本身有关，可能比较耗时
-	boolean b = HGSM.getInstance().unMountExternalStorage(id);
+	HGSM.getInstance().unMountExternalStorage("id", new UnMountStorageCallback() {
+          @Override
+          public void onReslut(boolean success, String msg) throws RemoteException {
+              Log.d("tag", "弹出" + id + (success ? "成功" : "失败:" + msg));
+          }
+    });
 
 -------------------------------------
 - **关机**
@@ -184,32 +189,7 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 	HGSM.getInstance().reboot(safeMode);
 
 -------------------------------------
-- **拉出/收起状态栏**
--------------------------------------
-
-::
-
-	//当前是拉出状态栏时，将收起，反之亦然
-	HGSM.getInstance().togglePanel();
-
--------------------------------------
-- **收起状态栏**
--------------------------------------
-
-::
-
-	HGSM.getInstance().collapsePanels();
-
--------------------------------------
-- **展开状态栏**
--------------------------------------
-
-::
-
-	HGSM.getInstance().expandPanel();
-
--------------------------------------
-- **设置系统的休眠时间**
+- **设置屏幕的休眠时间**
 -------------------------------------
 
 ::
@@ -218,7 +198,7 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 	boolean result = HGSM.getInstance().setSysSleepTime(delayTime);                       
 
 -------------------------------------
-- **获取系统的休眠时间**
+- **获取屏幕的休眠时间**
 -------------------------------------
 
 ::
@@ -302,7 +282,14 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 
 	//@param path 需要保存的目录  需要保证路径存在
 	//@param name 保存文件名
-	HGSM.getInstance().takeScreenshot(String path, String name);
+	HGSM.getInstance().takeScreenshot(path, name, new ScreenShotCallback() {
+            @Override
+            public void onReslut(boolean success, String msg) throws RemoteException {
+                //@success 成功/失败
+                //@msg 失败时的信息提示
+               Log.d("tag", success ? "截屏成功" : ("屏幕截屏失败:"+msg));
+            }
+        });
 
 -------------------------------------
 - **控制屏幕开关**
@@ -342,6 +329,38 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 	//@param command  要执行的命令 可能有些命令不支持
 	HGSM.getInstance().execSuCmd(command);
 
+-------------------------------------
+- **静默安装apk**
+-------------------------------------
+
+::
+
+	//@param path: 要安装的apk文件路径
+	HGSM.getInstance().silentInstallApk(path, new InstallCallback() {
+		@Override
+		public void onProgress(float progress) throws RemoteException {
+		   Log.d("tag", "安装进度:" + progress * 100 + "%");
+		}
+		@Override
+		public void onFinished(boolean success) throws RemoteException {
+		   Log.d("tag", "安装:" + (success ? "成功" : "失败"));
+		}
+	});
+
+-------------------------------------
+- **静默卸载app**
+-------------------------------------
+
+::
+
+	//@param pkg:要卸载的APP包名
+	HGSM.getInstance().silentUninstallApp("com.huago.app", new UnInstallCallback() {
+		 @Override
+		 public void onFinished(int returnCode) throws RemoteException {
+			 //@returnCode -1:失败 0：成功
+			 Log.d("tag", "卸载返回码：" + returnCode);
+		}
+	});
 
 ===============
 混淆规则
@@ -350,6 +369,7 @@ boolean execSuCmd(String command)										以root权限执行shell命令
 ::
 
 	-keep class com.huagao.sm.** { *; }
+	-keep class com.huagao.smsdk.** { *; }
 
 
 
