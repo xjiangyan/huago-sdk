@@ -37,7 +37,6 @@ String getAPIVersion()  																获取api版本信息
 String getAndroidDisplay() 																获取系统安装（升级）时间
 void hideNavBar(boolean hide) 															设置是否隐藏底部导航栏
 void setStatusBarDragable(boolean  drag)  												设置是否可以下拉出顶部状态栏
-void setAppAutoRun(String pkg) 															设置开机需要拉起的app
 void setDefaultLauncher(String pkg) 													设置默认的launcher
 List<RemovableStorageInfo> getRemovableExternalStorageList() 							获取外部可移动存储列表（U盘等）
 boolean unMountExternalStorage(String id)												根据提供的外部存储id来弹出设备
@@ -60,6 +59,13 @@ boolean execSuCmd(String command)														以root权限执行shell命令
 void silentInstallApk(String apkPath, InstallCallback callback)							静默安装apk
 void silentUninstallApp(String pkg, UnInstallCallback callback)							静默卸载APP
 void otaUpdate(String otaFilePath)														ota系统升级
+boolean isEnableWhitePackageFilter()													是否开启了安装应用白名单功能
+void setEnableWhitePackage(boolean isFilter)											应用安装白名单开关
+List getWhitePackageList()																获取应用安装白名单列表
+void setWhitePackageList(List packages)													设置应用安装白名单
+List getAutoRunList()																	获取当前开机要拉起的APP包名
+void setAutoRunList(List packages)														设置开机需要拉起的APP包名
+void clearAutoRunList()																	清空开机需要拉起的APP包名
 =============================================================================			==============================================================================================================================================================
 
 
@@ -125,16 +131,7 @@ void otaUpdate(String otaFilePath)														ota系统升级
 
 	//true:允许下拉显示状态栏 false:禁止下拉显示状态栏 
 	HGSM.getInstance().setStatusBarDragable(true);
-	
-----------------------------------
-- **设置开机需要拉起的app**
-----------------------------------
 
-::
-
-	//@param pkg  需要开机启动的apk包名
-	HGSM.getInstance().setAppAutoRun("com.huago.app");
-	
 ----------------------------------
 - **设置默认的launcher**
 ----------------------------------
@@ -348,19 +345,69 @@ void otaUpdate(String otaFilePath)														ota系统升级
 	});
 
 -------------------------------------
-- **静默卸载app**
+- **是否开启了安装应用白名单功能**
 -------------------------------------
 
 ::
 
-	//@param pkg:要卸载的APP包名
-	HGSM.getInstance().silentUninstallApp("com.huago.app", new UnInstallCallback() {
-		 @Override
-		 public void onFinished(int returnCode) throws RemoteException {
-			 //@returnCode -1:失败 0：成功
-			 Log.d("tag", "卸载返回码：" + returnCode);
-		}
-	});
+	boolean result= HGSM.getInstance().isEnableWhitePackageFilter();
+
+-------------------------------------
+- **应用安装白名单开关**
+-------------------------------------
+
+::
+
+	//true:开启白名单功能（只有白名单包名的应用可以安装）  false:关闭白名单功能（所有应用可以正常安装）
+	HGSM.getInstance().setEnableWhitePackage(false);
+
+-------------------------------------
+- **获取当前的应用安装白名单列表**
+-------------------------------------
+
+::
+	
+	//白名单里包名的应用可以安装
+	List<String> whitePackageList = HGSM.getInstance().getWhitePackageList();
+
+-------------------------------------
+- **设置当前应用安装白名单列表**
+-------------------------------------
+
+::
+
+	ArrayList<String> list = new ArrayList<>();
+	list.add("com.huago.app");
+	HGSM.getInstance().setWhitePackageList(list);
+	//需将setEnableWhitePackage 方法设置为true才会开启过滤功能
+
+-------------------------------------
+- **获取开机需要拉起的APP包名**
+-------------------------------------
+
+::
+
+	List<String> autoRunList = HGSM.getInstance().getAutoRunList();
+
+-------------------------------------
+- **设置开机拉起APP包名**
+-------------------------------------
+
+::
+
+	ArrayList<String> list = new ArrayList<>();
+	list.add("com.huago.app");
+	//添加后，设备开机将依次拉起该包名的应用
+	HGSM.getInstance().setAutoRunList(list);
+
+-------------------------------------
+- **清空开机拉起APP包名**
+-------------------------------------
+
+::
+
+	HGSM.getInstance().clearAutoRunList();
+	
 
 ===============
 混淆规则
