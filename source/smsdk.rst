@@ -345,6 +345,33 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 	});
 
 -------------------------------------
+- **静默卸载APP**
+-------------------------------------
+
+::
+
+	/**
+	* @param pkg:要卸载的APP包名
+	*/
+	HGSM.getInstance().silentUninstallApp("com.huago.app", new UnInstallCallback() {
+		 @Override
+		 public void onFinished(int returnCode) throws RemoteException {
+			 //@returnCode -1:失败 0：成功
+			 Log.d("tag", "卸载返回码：" + returnCode);
+		}
+	});
+
+-------------------------------------
+- **ota系统升级**
+-------------------------------------
+
+::
+
+	//传入升级包路径为系统进行ota系统升级。升级包最好直接放在 '/data/media/0/'目录下。
+	//方法调用后将检查升级包并提示系统升级
+	HGSM.getInstance().otaUpdate("/data/media/0/update.zip");
+
+-------------------------------------
 - **是否开启了安装应用白名单功能**
 -------------------------------------
 
