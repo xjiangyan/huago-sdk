@@ -14,11 +14,13 @@
 版本及修改记录
 ================
 
-===========		=============================================================			===============
-版本号			描述																	日期  												
-===========		=============================================================			===============
+===========		=============================================================			================
+版本号			描述																	日期												
+===========		=============================================================			================
 1.0.0			sdk初版，新增基础功能													2021/10/18
-===========		=============================================================			===============
+1.0.1			新增获取系统真实根路径功能												2022/01/11
+===========		=============================================================			================
+
 
 
 ================
@@ -59,6 +61,7 @@ boolean execSuCmd(String command)														以root权限执行shell命令
 void silentInstallApk(String apkPath, InstallCallback callback)							静默安装apk
 void silentUninstallApp(String pkg, UnInstallCallback callback)							静默卸载APP
 void otaUpdate(String otaFilePath)														ota系统升级
+String getRealRootPath()																获取系统真实根路径
 boolean isEnableWhitePackageFilter()													是否开启了安装应用白名单功能
 void setEnableWhitePackage(boolean isFilter)											应用安装白名单开关
 List getWhitePackageList()																获取应用安装白名单列表
@@ -138,6 +141,20 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 
 ::
 
+  1:首先在AndroidManifest.xml中，确保存在 category.DEFAULT 以及category.HOME
+
+	  <activity android:name=".MainActivity">
+		<intent-filter>
+			<action android:name="android.intent.action.MAIN"/>
+			<category android:name="android.intent.category.DEFAULT" /><!--必须-->
+			<category android:name="android.intent.category.HOME"></category><!--必须-->
+			<category android:name="android.intent.category.LAUNCHER" />
+		</intent-filter>
+	  </activity>
+
+
+  2.调用以下方法设置为默认的launcher
+	
 	//@param pkg  需要设为默认launcher的apk包名
 	HGSM.getInstance().setDefaultLauncher("com.huago.app");
 	
@@ -332,7 +349,7 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 
 ::
 
-	//@param path: 要安装的apk文件路径
+	//@param path: 要安装的apk文件路径。在安装完成后会自动打开该APP！！！
 	HGSM.getInstance().silentInstallApk(path, new InstallCallback() {
 		@Override
 		public void onProgress(float progress) throws RemoteException {
@@ -361,15 +378,27 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 		}
 	});
 
+------------------------
+- **获取系统真实根路径**
+------------------------
+
+::
+
+	//默认为 /data/media/0  
+	//对应于Android系统加载完成后获取到的:
+	//Environment.getExternalStorageDirectory().getAbsolutePath()
+	HGSM.getInstance().getRealRootPath();
+	
 -------------------------------------
 - **ota系统升级**
 -------------------------------------
 
 ::
 
-	//传入升级包路径为系统进行ota系统升级。升级包最好直接放在 '/data/media/0/'目录下。
-	//方法调用后将检查升级包并提示系统升级
-	HGSM.getInstance().otaUpdate("/data/media/0/ota.zip");
+	//传入升级包路径,为系统进行ota系统升级。升级包最好直接放在 getRealRootPath() 目录下。
+	//方法调用后将检查升级包并进行系统升级
+	File file = new File(HGSM.getInstance().getRealRootPath(), "ota.zip");
+	HGSM.getInstance().otaUpdate(file.getAbsolutePath());
 
 -------------------------------------
 - **是否开启了安装应用白名单功能**
