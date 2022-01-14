@@ -172,49 +172,46 @@ ErrorJamState;        code:5    S_EVT_PAPER_PULLOUT = 5;
 
 	**HGScanManager.getInstance().xxx();**
 
-=============================================================			==============================================================================================================================================================
+=============================================================			======================================================================================================================================================================================================================================================================
  方法名定义  															含义
-=============================================================  			==============================================================================================================================================================
-int init(Context var1);  sdk初始化
+=============================================================  			======================================================================================================================================================================================================================================================================
+int init(Context var1);													sdk初始化
 void setScanEventListener(ScanEventListener var1)  						扫描仪事件监听，参见{ScanEventListener}
 void setPreviewCallback(PreviewCallback callback, int format)   		注册扫描仪图像预览回调接口（format:PreviewCallback.xx）
 String getState()  														获取扫描仪当前状态
 void setSetting(ScanSetting setting)  									设置扫描参数，参见{ScanSetting}
 ScanSetting getScanSetting() 											获取当前扫描参数
-void set(int attribute, String value)  									扫描仪参数设置 attribute 参见{ScanDef.Attribute} value：例如{ScanDef.ColorMode}
-void set(int attribute, int value)  									扫描仪参数设置 attribute 参见{ScanDef.Attribute} value：例如{ScanDef.ColorMode}
-void operate(int cmd)  													扫描仪操作，操作指令，参见{ScanDef.CMD}
 void releasePreviewCallback()  											释放预览回调，避免context无法释放
-void startScan()  														开始扫描
-void resumeScan()  														继续扫描
+void startScan()  														开始扫描(返回的index从1开始递增)
+void resumeScan()  														继续扫描（返回的index从上一个继续递增）
 void pauseScan() 														暂停扫描
 void stopScan()  														停止扫描
-void clearError()  														清除错误
 void setScanMode(int mode)  											设置扫描模式  单面， 双面@param mode {@link ScanDef.ScanMode}
 void setColorMode(int mode) 											设置颜色模式@param mode {@link ScanDef.ColorMode}
 void setQuality(int quality)  											设置扫描质量@param mode {@link ScanDef.Qulality}
 void setAutoCut(boolean autoCut)  										自动裁剪
 void setAdjust(boolean adjust) 											自动纠偏
-void setDoubleChecked(boolean b)  										是否开启双张检测
-void setSkipBlank(boolean b)  											是否跳过空白页
+void setDoubleChecked(boolean b)  										是否开启双张检测（开启后检测到双张，扫描仪将停止扫描，此时需要把纸从设备中取出
+void setSkipBlank(boolean b)  											是否跳过空白页（空白页是指纯色页面，文稿内无其他内容，不限于纯白纸）
 void setFixCorner(boolean b)   											是否填充角落@since SDK 2.2.0
- void  setSavePath(String dir, String prefix) 							设置保存路径@param dir 要保存的文件夹@param prefix 文件名前缀
+void setSavePath(String dir, String prefix) 							设置保存路径@param dir 要保存的文件夹@param prefix 文件名前缀
 int getWheelPages()  													当前滚轮已扫描页数
 void clearWheelPages()  												更换滚轮，已清除滚轮扫描页数
 int getTotalPages()  													历史扫描总数
 void setPaperHeight(String type, int  height) 							设置纸张高度 @param type:纸张型号@param height：单位mm   {@link Paper}
-Bitmap getCachedPrevImage(int index)  									获取缓存的缩略图@param index 扫描图片索引 @return bitmap缩略图
-void setAdjustOrientation(int type, boolean discardUnMarked)  			设置mark点文本校正方向 type：ScanDef.MarkType discardUnMarked：是否丢掉没有mark定位的图
-void setAdjustOrientation(boolean b)  									设置mark点文本校正方向 ，默认多边mark点，不丢弃图
+Bitmap getCachedPrevImage(int index)  									获取缓存的缩略图@param index 扫描图片索引 @return bitmap缩略图（仅限最新20张图像
+void setAdjustOrientation(int type, boolean discardUnMarked)  			设置mark点文本校正方向 @param type mark类型，可选：{@link ScanDef.MarkType#Muti}、{@link ScanDef.MarkType#Tri}@param discardUnMarked 是否丢掉没有mark定位的图（需要纸张有特定的mark点标记才能把图片矫正为“正向”，具体点位需要与开发人员联系获取）
+void setAdjustOrientation(boolean b)  									设置mark点文本校正方向 ，默认多边mark点，不丢弃图（需要纸张有特定的mark点标记才能把图片矫正为“正向”，具体点位需要与开发人员联系获取）
 void setAutoScanDelayTime(int millisecond) 								设置多少毫秒内待纸自动扫描
+void setWaitPaperTime													设置自动待纸扫描的等待时间
 Statistics getStatistics()  											获取设备扫描数据统计
-void flipPage(boolean flip)	 											AB面翻转
-void reportInfo															设备日志上传
+void flipPage(boolean flip)	 											AB面翻转（默认false：面向用户页先出图true:面向用户页后出图）
+void reportInfo															设备日志上传(description：例如错误如何出现)
 void getSN																设备唯一编号
-void setCropThreshold													设置裁切时明暗场阈值
+void setCropThreshold													设置裁切时明暗场阈值(默认40)
 void setDetectDogEar													折角检测
 void setDpi																自定义dpi
-=============================================================			==============================================================================================================================================================
+=============================================================			======================================================================================================================================================================================================================================================================
 
 
 
@@ -251,13 +248,11 @@ void setDpi																自定义dpi
         @Override
         public void onEvent(final int code, final String status) {
             switch (status) {
-                case EventDef.STATE_SDK_INIT:  //SDK初始化 成功 可以获取扫描仪的信息以及执行操作了
-                    break;
-                case EventDef.STATE_STANDBY:    // 空闲
+                case EventDef.STATE_STANDBY:    //  空闲（没有触发‘有无纸弹片’）
                     break;
                 case EventDef.STATE_PAPER_READY:  // 就绪（纸张放好）
                     break;
-                case EventDef.STATE_COVER_OPEN: // 纸盒打开
+                case EventDef.STATE_COVER_OPEN: //  开盖
                     break;
                 case EventDef.STATE_SCANNING:
                     if (code == EventDef.S_EVT_START_SCAN) { //开始扫描了
@@ -269,7 +264,7 @@ void setDpi																自定义dpi
                 default:
                     break;
             }
-            if (code == EventDef.S_EVT_SCAN_STOPPED) {//扫描结束信号
+            if (code == EventDef.S_EVT_SCAN_STOPPED) {//扫描结束信号（指机械走纸已结束，即人眼看到的已经扫描完成。因为图像处理是异步的，所以延迟200~300毫秒左右，可以确保图像也处理完成并抛出）
             }
         }
     };
@@ -281,21 +276,20 @@ void setDpi																自定义dpi
 
 ::
 
-  /**
-     * 设置保存路径
-     * @param dir 要保存的文件夹
-     * @param prefix 文件名前缀
-     */
-	HGScanManager.getInstance().setSavePath("/sdcard/picture", "Doc");
-	HGScanManager.getInstance().setScanMode(ScanDef.ScanMode.Single);//单面打印
-	HGScanManager.getInstance().setColorMode(ScanDef.ColorMode.Color);//设置打印模式--黑白/彩色
-	HGScanManager.getInstance().setQuality(ScanDef.Qulality.High);//设置打印图像质量 300dpi(高)
-	HGScanManager.getInstance().setDoubleChecked(true);//开启双张检测
-	HGScanManager.getInstance().setAutoCut(true);//开启图像裁切
-	HGScanManager.getInstance().setAdjust(true);//开启图像纠偏
+		HGScanManager.getInstance().setSavePath("/sdcard/picture", "Doc");//设置保存路径 prefix:文件名前缀
+		HGScanManager.getInstance().setScanMode(ScanDef.ScanMode.Single);//单面扫描
+		HGScanManager.getInstance().setColorMode(ScanDef.ColorMode.Color);//设置扫描模式--黑白/彩色
+		HGScanManager.getInstance().setQuality(ScanDef.Qulality.Standard);//设置扫描图像质量 200dpi(标准)
+		HGScanManager.getInstance().setDoubleChecked(true);//开启双张检测
+		//关于图像裁切与图像纠偏功能
+		//一般 setAutoCut 与 setAdjust 会同时开启，这样可以得到完整的切割好的图像。
+		//关闭的话，会输出包含黑色背景的原图。当出现异常图像时，可以输出原图，给开发人员
+		分析图像处理异常的原因
+		HGScanManager.getInstance().setAutoCut(true);//开启图像裁切
+		HGScanManager.getInstance().setAdjust(true);//开启图像纠偏
+		//AB面翻转 @default false：面向用户页后出图 true:面向用户页先出图
+		HGScanManager.getInstance().flipPage(false);
 
-	//AB面翻转 @default false：面向用户页后出图   true:面向用户页先出图
-	HGScanManager.getInstance().flipPage(false);
 
 
 ---------------
@@ -305,9 +299,13 @@ void setDpi																自定义dpi
 ::
 
 	// @params index:纸张出图顺序index，绝对值相同的为一张纸的正反面
-	// @params image:在本地的图片地址 例如：/sdcard/picture/Doc1630391378_5.jpg
+	// @params image: 1.当保存格式为：
+	// FORMAT_JPEG_FILE、FORMAT_TIFF_FILE 时：
+	// 在本地的图片地址 例如：/sdcard/picture/Doc1630391378_5.jpg
 	// 若文件名末尾数字的绝对值相同，属于一张纸的正反面。
 	// 例如：Doc1630391378_5.jpg 与 Doc1630391390_-5.jpg。
+	// FORMAT_BITMAP 时：image返回的是bitmap
+	//（重复注册会清空图像队列，可能会导致上一次的图片没接收完，请确保在接收到扫描仪停止信号之后，再次注册。建议一个页面就注册一次，setPreviewCallback方法与releasePreviewCallback方法需要成对出现）
 	HGScanManager.getInstance().setPreviewCallback(new PreviewCallback() {
 		@Override
 		public void onPreview(int index, Object image) {
@@ -332,9 +330,9 @@ void setDpi																自定义dpi
         super.onDestroy();
     }
 
-----------------
-- **开始扫描**
-----------------
+---------------------------------------------
+- **开始扫描（回调中index重置为1开始计数）**
+---------------------------------------------
 
 ::
 
@@ -356,30 +354,22 @@ void setDpi																自定义dpi
 
 	HGScanManager.getInstance().stopScan();
 
----------------
-- **重新扫描**
----------------
+--------------------------------------------------
+- **重新扫描/继续扫描（回调中index会继续递增）**
+--------------------------------------------------
 
 ::
 
 	HGScanManager.getInstance().resumeScan();
 
------------------
-- **异常处理**
------------------
-
-::
-
-	HGScanManager.getInstance().operate(ScanDef.CMD.CLEAR_ERROR);//清除错误
-	HGScanManager.getInstance().operate(ScanDef.CMD.RESET);//设备复位
-
 ---------------
-- **退出卡纸**
+- **退出双张**
 ---------------
 
 ::
 
-	HGScanManager.getInstance().operate(ScanDef.CMD.PULL_PAPER);//退出卡纸
+	//当纸张歪斜的卡在设备中，此时使用该功能可能会使纸张受损，建议异常时弹窗提示手动开盖取出纸张并重新扫描
+	HGScanManager.getInstance().operate(ScanDef.CMD.PULL_PAPER);//退出双张
 
 ---------------
 - **扫描统计**
@@ -424,8 +414,9 @@ void setDpi																自定义dpi
 ::
 
 	//当设备出现故障，用户可上传本机信息进行后台分析
-	//@param description 描述信息（可选）  填入 “问题产生的经过”，方便后续问题排查
+	//@param description 描述信息（可选） 填入 “问题产生的经过”，方便后续问题排查
 	//@param callBack  日志上传回调
+	// 此操作会默认上传设备最新的部分日志
 	reportInfo(String description, LogcatManager.ReportCallBack callBack)
 
 -----------------------------
@@ -458,6 +449,7 @@ void setDpi																自定义dpi
 ::
 
 	//@since SDK 2.6.0   @param b 是否检测折角
+	//  检测到折角不会停止扫描，只会在图片回调中添加一个标志tag
 	setDetectDogEar(boolean b);
 
 -------------------------
@@ -495,6 +487,12 @@ void setDpi																自定义dpi
 
 ::
 
+		//该方案是移植的微信在openCV开放的二维码功能，具体容错率等参数可以直接查看文档或自行百度：
+		// https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html
+		// github地址：
+		// https://github.com/opencv/opencv_contrib/tree/master/modules/wechat_qrcode
+		// 打不开可以访问码云上的第三方地址：
+		// https://gitee.com/idledo/opencv_contrib/tree/4.x/modules/wechat_qrcode
 		  QrCodeDec qrCodeDec = new QrCodeDec();
 		  
 		  //传入bitmap进行检测  返回值：可能是多个二维码信息
@@ -539,7 +537,7 @@ void setDpi																自定义dpi
 
 ..
 
-	设备连接局域网后，在命令行中输入adb connnect 设备ip:5555即可。（不可使用usb调试）
+	设备连接局域网后，在命令行中输入adb connnect 设备ip:5555即可。（rk3288版本不可使用usb调试）
 
 -----------------------------------------
 2、扫描纸张的时候越扫越慢，这是什么原因？
@@ -562,18 +560,8 @@ void setDpi																自定义dpi
 
 .. image:: /image/HuagaoSDK_Image_2.jpg
 
---------------------------------------------
-4、为何运行sdk时会出现NoClassDefFound异常？
---------------------------------------------
-..   
-
-	sdk内部依赖三个库文件，请确保主工程已经依赖这两个库。
-
-
-.. image:: /image/HuagaoSDK_Image_3.png
-
 ---------------------------------
-5、如何配置自己的launcher程序？
+4、如何配置自己的launcher程序？
 ---------------------------------
 
 ..
@@ -593,17 +581,17 @@ void setDpi																自定义dpi
 
 ..
 
-	2:进入adb shell之后，setprop persist.sys.default.home "定制launcher的包名"，可以将系统启动桌面设置为自己开发的launcher
+	2:进入adb shell之后，setprop persist.sys.default.home “定制launcher的包名”，之后设备重启完成可以将系统启动桌面设置为自己开发的launcher
 	
 ----------------------
-6、如何隐藏虚拟按键？
+5、如何隐藏虚拟按键？
 ----------------------
 ..
 
-	进入adb shell之后，setprop persist.sys.hidenav 1,可以隐藏虚拟按键，全屏显示
+	进入adb shell之后，setprop persist.sys.hidenav 1,可以隐藏虚拟按键，全屏显示 设为0则显示虚拟按键
 	
 -----------------------------
-7、如何开机自动拉起一个应用？
+6、如何开机自动拉起一个应用？
 -----------------------------
 ..
 
@@ -624,14 +612,14 @@ void setDpi																自定义dpi
 	进入adb shell之后，setprop persist.sys.package.autorun “应用包名”。
 	
 ---------------------------------------------------------------
-8、在设置了扫描回调之后，扫描仪扫描结束为什么不会返回图片信息？
+7、在设置了扫描回调之后，扫描仪扫描结束为什么不会返回图片信息？
 ---------------------------------------------------------------
 ..
 
 	请确保只开启了一个扫描程序，后开启监听的扫描程序会优先接收到扫描信息，而之前的不会接收消息。
 
 ---------------------------------------------------------------
-9、关于设备清洁维护
+8、关于设备清洁维护
 ---------------------------------------------------------------
 ..
 	当搓纸轮已超过15万次搓纸，扫描作业过程中搓纸失败、歪斜、搓多张等异常频次可能会明显增多，建议及时弹窗提示用户替换纸轮。
