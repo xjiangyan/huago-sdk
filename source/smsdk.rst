@@ -18,7 +18,7 @@
 版本号			描述																	日期												
 ===========		=============================================================			================
 1.0.0			sdk初版，新增基础功能													2021/10/18
-1.0.1			新增获取系统真实根路径功能												2022/01/11
+1.1.1			新增获取系统真实根路径功能												2022/01/11
 ===========		=============================================================			================
 
 
@@ -70,6 +70,7 @@ void setWhitePackageList(List packages)													设置应用安装白名单
 List getAutoRunList()																	获取当前开机要拉起的APP包名
 void setAutoRunList(List packages)														设置开机需要拉起的APP包名
 void clearAutoRunList()																	清空开机需要拉起的APP包名
+boolean setAllowFloatWindow(String pkg)													获取悬浮窗权限
 ===============================================================================			==============================================================================================================================================================
 
 
@@ -158,6 +159,8 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 	
 	//@param pkg  需要设为默认launcher的apk包名
 	HGSM.getInstance().setDefaultLauncher("com.huago.app");
+	
+  3.重启设备
 	
 ----------------------------------------------
 - **获取已挂载的外部可移动存储列表（U盘等）**
@@ -488,7 +491,15 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 ::
 
 	HGSM.getInstance().clearAutoRunList();
-	
+
+-------------------------------------
+- **获取悬浮窗权限**
+-------------------------------------
+::
+
+	//@param pkg:需要获取悬浮窗权限应用的包名
+	//请确保清单文件中存在<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	HGSM.getInstance().setAllowFloatWindow("com.huago.app");
 
 ===============
 混淆规则
@@ -498,6 +509,16 @@ void clearAutoRunList()																	清空开机需要拉起的APP包名
 
 	-keep class com.huagao.sm.** { *; }
 	-keep class com.huagao.smsdk.** { *; }
+	
+	
+===============
+注意事项
+===============
+
+	1.关于安装白名单
+		1)：通过sdk配置的白名单包名，在 ‘系统根目录/HgInstallFilter/whitelist’ 中留有记录。
+		
+		2)：使用adb的方式控制开关：进入adb shell 之后，使用pm set-filter-package true 开启白名单，设为false将关闭白名单。
 
 
 
